@@ -19,6 +19,7 @@
 #     command:             Slash command to execute (e.g., "/speckit.plan")
 #     args:                Optional — supports {{arg}} interpolation
 #     autonomy:            Decision mode (see below)
+#     model:               Optional — AI model override (see below)
 #     preconditions:       Optional list of artifact checks (see below)
 #     postconditions:      Optional list of artifact checks (see below)
 #     error_policy:        Behavior on failure (see below)
@@ -30,6 +31,12 @@
 #   gate_on_breaking Gate only when a breaking change is detected
 #   gate_always      Always halt for human decision
 #   skip             Skip execution, log as skipped
+#
+# ── Model Values ──────────────────────────────────────
+#   opus             Most capable model (complex reasoning, specifications)
+#   sonnet           Balanced model (general-purpose tasks)
+#   haiku            Fastest model (simple checks, validations)
+#   (omit field)     Use session default model
 #
 # ── Error Policies ──────────────────────────────────────
 #   stop             Halt all execution, mark session as failed

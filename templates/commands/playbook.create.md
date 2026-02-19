@@ -69,6 +69,7 @@ For each playbook file (EXCLUDING `playbook.tpl.yaml`), read its contents and ex
 - **Error policy patterns**: Which step types use which policies (e.g., implementation steps use `retry_once`)
 - **Escalation trigger patterns**: Which triggers are paired with which step types
 - **Condition chains**: How preconditions flow into postconditions across steps
+- **Model patterns**: Which steps specify a `model` override and which omit it (session default)
 - **Naming conventions**: Playbook name slug format, step ID patterns
 
 Build a pattern reference table like this:
@@ -251,6 +252,12 @@ For each mapped command (from Step 2.3), generate a step with:
 - Steps that use Task subagents: add `"subagent_error"`
 - Simple auto steps with no complex failure modes: `[]`
 
+**Model** (optional): Assign a specific model when a step benefits from a particular capability profile. If no existing pattern, use these defaults:
+- Most steps: omit the field (use session default)
+- Lightweight or fast steps (intake, triage, simple checks): `haiku` is a good candidate
+- Complex analysis or implementation steps (implement, plan, agreement-check): `opus` or omit for default
+- Only include `model` when there is a clear reason to override the session default — do not add it to every step
+
 ### 3.5 Argument Interpolation Rules
 
 **CRITICAL**: Generated playbooks must be reusable across features. Follow these rules strictly:
@@ -289,7 +296,8 @@ Format the YAML following the conventions observed in existing playbooks:
 - Lists use block style with `- ` prefix
 - Empty lists use inline `[]` syntax
 - Steps indented with 2 spaces under `steps:`
-- Step fields in order: `id`, `command`, `args`, `autonomy`, `preconditions`, `postconditions`, `error_policy`, `escalation_triggers`
+- Step fields in order: `id`, `command`, `args`, `model`, `autonomy`, `preconditions`, `postconditions`, `error_policy`, `escalation_triggers`
+- The `model` field is optional — only include it when overriding the session default
 - Each step separated by a blank line for readability
 - 2-space indentation throughout
 - Version is always `"1.0"`
@@ -582,6 +590,16 @@ The generated playbook MUST conform to this schema. The validator (`npx @tcanaud
 | `postconditions` | string[] | No | Subset of condition vocabulary |
 | `error_policy` | enum | Yes | `stop`, `retry_once`, `gate` |
 | `escalation_triggers` | string[] | No | Subset of trigger vocabulary |
+| `model` | enum | No | `opus`, `sonnet`, `haiku` — omit to use session default |
+
+### Model Values
+
+| Value | Description |
+|-------|-------------|
+| `opus` | Most capable model for complex work |
+| `sonnet` | Best for everyday tasks |
+| `haiku` | Fastest for quick answers |
+| *(omit field)* | Use session default model |
 
 ### Condition Vocabulary
 
@@ -612,4 +630,4 @@ The generated playbook MUST conform to this schema. The validator (`npx @tcanaud
 - Empty lists as inline `[]`
 - 2-space indentation
 - Blank line between steps
-- Step fields in order: `id`, `command`, `args`, `autonomy`, `preconditions`, `postconditions`, `error_policy`, `escalation_triggers`
+- Step fields in order: `id`, `command`, `args`, `model`, `autonomy`, `preconditions`, `postconditions`, `error_policy`, `escalation_triggers`

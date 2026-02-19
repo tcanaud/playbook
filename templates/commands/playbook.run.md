@@ -119,6 +119,7 @@ Update `session.yaml`: set `current_step` to the step ID.
 
 Use the **Task tool** to delegate the step:
 - Launch a subagent with `subagent_type: "general-purpose"`
+- **Model selection**: If the step has a non-null `model` value, include `model: "{step.model}"` in the Task tool call. If `model` is null (absent or empty), omit the model parameter so the session default applies.
 - The prompt MUST include:
   - The slash command to execute (e.g., "Execute /speckit.plan")
   - The arguments (with resolved interpolation)

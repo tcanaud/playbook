@@ -13,3 +13,7 @@ playbooks:
     file: "playbooks/auto-validate.yaml"
     description: "QA validation: plan and run"
     steps: 2
+  - name: "intention-to-pr"
+    file: "playbooks/intention-to-pr.yaml"
+    description: "End-to-end flow from product intention to pull request"
+    steps: 12

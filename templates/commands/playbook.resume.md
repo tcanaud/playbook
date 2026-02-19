@@ -114,7 +114,7 @@ For each remaining step (from the resume point):
 
 1. **Check preconditions** — evaluate each condition
 2. **Evaluate autonomy level** — auto, gate_on_breaking, gate_always, skip
-3. **Delegate via Task subagent** — fresh context per step
+3. **Delegate via Task subagent** — fresh context per step. If the step has a non-null `model` value, include `model: "{step.model}"` in the Task tool call; otherwise omit the model parameter.
 4. **Check postconditions** — verify artifacts exist
 5. **Handle escalation triggers** — promote auto to gate if trigger fires
 6. **Apply error policy** — stop, retry_once, gate
