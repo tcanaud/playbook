@@ -1,6 +1,6 @@
 {
   "name": "@tcanaud/playbook",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "type": "module",
   "description": "YAML-driven orchestration for kai feature workflows — autonomous playbook execution with crash recovery, gates, and git-tracked audit journals.",
   "bin": {
