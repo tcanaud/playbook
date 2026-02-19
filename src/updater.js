@@ -69,6 +69,7 @@ export function update(flags = []) {
   const commandMappings = [
     ["commands/playbook.run.md", ".claude/commands/playbook.run.md"],
     ["commands/playbook.resume.md", ".claude/commands/playbook.resume.md"],
+    ["commands/playbook.create.md", ".claude/commands/playbook.create.md"],
   ];
 
   for (const [src, dest] of commandMappings) {

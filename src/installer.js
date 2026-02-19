@@ -119,7 +119,7 @@ export async function install(flags = []) {
     console.log("    created .claude/commands/");
   }
 
-  const commandFiles = ["playbook.run.md", "playbook.resume.md"];
+  const commandFiles = ["playbook.run.md", "playbook.resume.md", "playbook.create.md"];
 
   for (const file of commandFiles) {
     const src = join(TEMPLATES, "commands", file);

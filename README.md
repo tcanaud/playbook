@@ -10,7 +10,7 @@ npx @tcanaud/playbook init
 
 This creates:
 - `.playbooks/` directory with built-in playbooks and template
-- `.claude/commands/playbook.run.md` and `playbook.resume.md` slash commands
+- `.claude/commands/playbook.run.md`, `playbook.resume.md`, and `playbook.create.md` slash commands
 
 ## CLI Commands
 
@@ -30,6 +30,7 @@ After installation, use these in the Claude Code TUI:
 |---------|-------------|
 | `/playbook.run {playbook} {feature}` | Launch supervisor to orchestrate playbook steps |
 | `/playbook.resume` | Auto-detect and resume an interrupted session |
+| `/playbook.create {intention}` | Generate a custom playbook from a free-text intention |
 
 ## Built-in Playbooks
 
@@ -39,6 +40,26 @@ After installation, use these in the Claude Code TUI:
 | `auto-validate` | 2 | QA plan → QA run |
 
 ## Custom Playbooks
+
+### Generate with `/playbook.create`
+
+The fastest way to create a custom playbook is to describe your workflow in plain language:
+
+```
+/playbook.create validate and deploy a hotfix for critical bugs
+```
+
+The system will:
+1. Analyze your project (installed tools, available commands, existing playbook patterns)
+2. Map your intention to a sequence of slash commands
+3. Generate a valid playbook YAML file
+4. Present it for review with per-step rationale
+5. Accept modifications in an interactive refinement loop
+6. Write the final playbook to `.playbooks/playbooks/{name}.yaml` and update the index
+
+If a playbook with the derived name already exists, the system offers to overwrite, rename, or cancel.
+
+### Create manually from template
 
 ```bash
 cp .playbooks/playbooks/playbook.tpl.yaml .playbooks/playbooks/my-workflow.yaml
