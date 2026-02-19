@@ -197,6 +197,72 @@ export function readJournal(sessionDir) {
 // ---------------------------------------------------------------------------
 
 /**
+ * Discovers all sessions in {basePath}/sessions/ directory.
+ * Returns array of session directory paths sorted by most recent first.
+ *
+ * @param {string} basePath - Absolute path to the .playbooks/ directory or sessions directory.
+ * @returns {Array<string>} Array of absolute paths to session directories.
+ */
+export function discoverSessions(basePath) {
+  // Handle both .playbooks/ and .playbooks/sessions/ paths
+  const sessionsDir = basePath.endsWith("sessions") ? basePath : join(basePath, "sessions");
+
+  if (!existsSync(sessionsDir)) {
+    return [];
+  }
+
+  let entries;
+  try {
+    entries = readdirSync(sessionsDir, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+
+  const sessionDirs = entries
+    .filter((dirent) => dirent.isDirectory())
+    .map((dirent) => join(sessionsDir, dirent.name))
+    .sort()
+    .reverse(); // Most recent first (descending order)
+
+  return sessionDirs;
+}
+
+/**
+ * Parses session directories into session objects.
+ * Reads session.yaml from each directory and extracts metadata.
+ * Skips unreadable sessions with warnings.
+ *
+ * @param {Array<string>} sessionDirs - Array of absolute paths to session directories.
+ * @returns {Array<{ id: string, createdAt: string, status: string, sessionDir: string }>}
+ */
+export function parseSessions(sessionDirs) {
+  const sessions = [];
+
+  for (const sessionDir of sessionDirs) {
+    try {
+      const manifest = readSession(sessionDir);
+      const sessionId = manifest.session_id || null;
+
+      if (!sessionId) {
+        console.warn(`Warning: Session in ${sessionDir} has no session_id, skipping.`);
+        continue;
+      }
+
+      sessions.push({
+        id: sessionId,
+        createdAt: manifest.started_at,
+        status: manifest.status,
+        sessionDir,
+      });
+    } catch (error) {
+      console.warn(`Warning: Could not read session in ${sessionDir}: ${error.message}`);
+    }
+  }
+
+  return sessions;
+}
+
+/**
  * Scans {playbooksDir}/sessions/ for sessions with status "in_progress".
  * Returns results sorted by most recent first (by session ID timestamp prefix).
  *
