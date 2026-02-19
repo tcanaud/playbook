@@ -1,0 +1,31 @@
+{
+  "name": "@tcanaud/playbook",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "YAML-driven orchestration for kai feature workflows — autonomous playbook execution with crash recovery, gates, and git-tracked audit journals.",
+  "bin": {
+    "playbook": "./bin/cli.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "templates/"
+  ],
+  "keywords": [
+    "kai",
+    "playbook",
+    "orchestration",
+    "supervisor",
+    "workflow",
+    "claude-code"
+  ],
+  "author": "Thibaud Canaud",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tcanaud/playbook.git"
+  }
+}

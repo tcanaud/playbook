@@ -1,0 +1,88 @@
+# Playbook Template
+# Copy this file and customize it for your workflow.
+# Validate with: npx @tcanaud/playbook check <file>
+#
+# ── Schema Reference ────────────────────────────────────
+#
+# Top-level fields (all required):
+#   name:        Unique identifier [a-z0-9-]+
+#   description: Human-readable purpose
+#   version:     Schema version (e.g., "1.0")
+#
+# args (required, may be empty array):
+#   - name:        Argument name, referenced as {{name}} in step args
+#     description: Purpose of the argument
+#     required:    true | false
+#
+# steps (required, min 1):
+#   - id:                  Unique within playbook [a-z0-9-]+
+#     command:             Slash command to execute (e.g., "/speckit.plan")
+#     args:                Optional — supports {{arg}} interpolation
+#     autonomy:            Decision mode (see below)
+#     preconditions:       Optional list of artifact checks (see below)
+#     postconditions:      Optional list of artifact checks (see below)
+#     error_policy:        Behavior on failure (see below)
+#     escalation_triggers: Optional list of triggers (see below)
+#     parallel_group:      Optional — steps with same group run concurrently
+#
+# ── Autonomy Levels ─────────────────────────────────────
+#   auto             Execute without human interaction
+#   gate_on_breaking Gate only when a breaking change is detected
+#   gate_always      Always halt for human decision
+#   skip             Skip execution, log as skipped
+#
+# ── Error Policies ──────────────────────────────────────
+#   stop             Halt all execution, mark session as failed
+#   retry_once       Re-execute once; if still fails, stop
+#   gate             Escalate to human decision with failure context
+#
+# ── Escalation Triggers ────────────────────────────────
+#   postcondition_fail   Any postcondition fails after step execution
+#   verdict_fail         QA verdict file contains FAIL
+#   agreement_breaking   Agreement check detects breaking changes
+#   subagent_error       Task subagent returns error or crashes
+#
+# ── Conditions (Pre/Post) ──────────────────────────────
+#   spec_exists       specs/{feature}/spec.md exists
+#   plan_exists       specs/{feature}/plan.md exists
+#   tasks_exists      specs/{feature}/tasks.md exists
+#   agreement_exists  .agreements/{feature}/agreement.yaml exists
+#   agreement_pass    .agreements/{feature}/check-report.md verdict: PASS
+#   qa_plan_exists    .qa/{feature}/test-plan.md exists
+#   qa_verdict_pass   .qa/{feature}/verdict.md verdict: PASS
+#   pr_created        gh pr list --head {branch} returns non-empty
+#
+# ════════════════════════════════════════════════════════
+
+name: "my-workflow"
+description: "Describe your workflow here"
+version: "1.0"
+
+args:
+  - name: "feature"
+    description: "Feature branch name"
+    required: true
+
+steps:
+  - id: "step-1"
+    command: "/speckit.plan"
+    args: ""
+    autonomy: "auto"
+    preconditions:
+      - "spec_exists"
+    postconditions:
+      - "plan_exists"
+    error_policy: "stop"
+    escalation_triggers: []
+
+  # Add more steps below following the same structure.
+  # Use parallel_group to run steps concurrently:
+  #
+  # - id: "step-a"
+  #   command: "/some.command"
+  #   parallel_group: "phase-2"
+  #   ...
+  # - id: "step-b"
+  #   command: "/other.command"
+  #   parallel_group: "phase-2"
+  #   ...

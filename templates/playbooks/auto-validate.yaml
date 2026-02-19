@@ -1,0 +1,31 @@
+name: "auto-validate"
+description: "QA validation: plan and run"
+version: "1.0"
+
+args:
+  - name: "feature"
+    description: "Feature branch name (e.g., 012-playbook-supervisor)"
+    required: true
+
+steps:
+  - id: "qa-plan"
+    command: "/qa.plan"
+    args: "{{feature}}"
+    autonomy: "auto"
+    preconditions:
+      - "spec_exists"
+    postconditions:
+      - "qa_plan_exists"
+    error_policy: "stop"
+    escalation_triggers: []
+
+  - id: "qa-run"
+    command: "/qa.run"
+    args: "{{feature}}"
+    autonomy: "auto"
+    preconditions:
+      - "qa_plan_exists"
+    postconditions:
+      - "qa_verdict_pass"
+    error_policy: "stop"
+    escalation_triggers: []

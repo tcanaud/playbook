@@ -1,0 +1,100 @@
+name: "auto-feature"
+description: "Full feature workflow from plan to PR"
+version: "1.0"
+
+args:
+  - name: "feature"
+    description: "Feature branch name (e.g., 012-playbook-supervisor)"
+    required: true
+
+steps:
+  - id: "plan"
+    command: "/speckit.plan"
+    args: ""
+    autonomy: "auto"
+    preconditions:
+      - "spec_exists"
+    postconditions:
+      - "plan_exists"
+    error_policy: "stop"
+    escalation_triggers: []
+
+  - id: "tasks"
+    command: "/speckit.tasks"
+    args: ""
+    autonomy: "auto"
+    preconditions:
+      - "plan_exists"
+    postconditions:
+      - "tasks_exists"
+    error_policy: "stop"
+    escalation_triggers: []
+
+  - id: "agreement"
+    command: "/agreement.create"
+    args: "{{feature}}"
+    autonomy: "auto"
+    preconditions:
+      - "tasks_exists"
+    postconditions:
+      - "agreement_exists"
+    error_policy: "gate"
+    escalation_triggers:
+      - "subagent_error"
+
+  - id: "implement"
+    command: "/speckit.implement"
+    args: ""
+    autonomy: "auto"
+    preconditions:
+      - "agreement_exists"
+    postconditions: []
+    error_policy: "retry_once"
+    escalation_triggers:
+      - "postcondition_fail"
+      - "subagent_error"
+
+  - id: "agreement-check"
+    command: "/agreement.check"
+    args: "{{feature}}"
+    autonomy: "gate_on_breaking"
+    preconditions: []
+    postconditions:
+      - "agreement_pass"
+    error_policy: "gate"
+    escalation_triggers:
+      - "agreement_breaking"
+
+  - id: "qa-plan"
+    command: "/qa.plan"
+    args: "{{feature}}"
+    autonomy: "auto"
+    preconditions:
+      - "agreement_pass"
+    postconditions:
+      - "qa_plan_exists"
+    error_policy: "stop"
+    escalation_triggers: []
+
+  - id: "qa-run"
+    command: "/qa.run"
+    args: "{{feature}}"
+    autonomy: "auto"
+    preconditions:
+      - "qa_plan_exists"
+    postconditions:
+      - "qa_verdict_pass"
+    error_policy: "gate"
+    escalation_triggers:
+      - "verdict_fail"
+
+  - id: "pr"
+    command: "/feature.pr"
+    args: "{{feature}}"
+    autonomy: "gate_always"
+    preconditions:
+      - "qa_verdict_pass"
+    postconditions:
+      - "pr_created"
+    error_policy: "stop"
+    escalation_triggers: []
