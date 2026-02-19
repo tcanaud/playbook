@@ -39,6 +39,7 @@ const CONDITION_VALUES = [
   "qa_verdict_pass",
   "pr_created",
 ];
+const MODEL_VALUES = ["opus", "sonnet", "haiku"];
 
 // ---------------------------------------------------------------------------
 // Patterns
@@ -218,6 +219,14 @@ function _validatePlaybook(playbook, _filePath) {
       violations.push(
         `${stepRef}: error_policy "${step.error_policy}" is not valid ` +
           `(allowed: ${ERROR_POLICY_VALUES.join(", ")})`
+      );
+    }
+
+    // model enum.
+    if (step.model && !MODEL_VALUES.includes(step.model)) {
+      violations.push(
+        `${stepRef}: model "${step.model}" is not valid ` +
+          `(allowed: ${MODEL_VALUES.join(", ")})`
       );
     }
 

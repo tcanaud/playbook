@@ -5,8 +5,8 @@
  * Run with: node --test tests/yaml-parser.test.js
  */
 
-import { test, describe } from "node:test";
 import assert from "node:assert/strict";
+import { describe, test } from "node:test";
 import { parsePlaybook } from "../src/yaml-parser.js";
 
 // ---------------------------------------------------------------------------
@@ -471,6 +471,76 @@ steps:
     assert.equal(step.args, "");
   });
 
+  test("step with model: sonnet parses to model: sonnet", () => {
+    const yaml = `
+name: test
+description: Model test
+version: 1.0
+args: []
+steps:
+  - id: s
+    command: /c
+    autonomy: auto
+    error_policy: stop
+    model: "sonnet"
+`;
+    const result = parsePlaybook(yaml);
+    assert.equal(result.steps[0].model, "sonnet");
+  });
+
+  test("step without model field parses to model: null", () => {
+    const yaml = `
+name: test
+description: No model
+version: 1.0
+args: []
+steps:
+  - id: s
+    command: /c
+    autonomy: auto
+    error_policy: stop
+`;
+    const result = parsePlaybook(yaml);
+    assert.equal(result.steps[0].model, null);
+  });
+
+  test("all three valid model values parse correctly", () => {
+    const models = ["opus", "sonnet", "haiku"];
+    for (const model of models) {
+      const yaml = `
+name: test
+description: Testing model
+version: 1.0
+args: []
+steps:
+  - id: s
+    command: /c
+    autonomy: auto
+    error_policy: stop
+    model: ${model}
+`;
+      const result = parsePlaybook(yaml);
+      assert.equal(result.steps[0].model, model, `model=${model}`);
+    }
+  });
+
+  test("step with model: empty string parses to model: null", () => {
+    const yaml = `
+name: test
+description: Empty model
+version: 1.0
+args: []
+steps:
+  - id: s
+    command: /c
+    autonomy: auto
+    error_policy: stop
+    model: ""
+`;
+    const result = parsePlaybook(yaml);
+    assert.equal(result.steps[0].model, null);
+  });
+
   test("handles Windows CRLF line endings", () => {
     const yaml = "name: win\r\ndescription: Windows line endings\r\nversion: 1.0\r\n\r\nargs: []\r\n\r\nsteps:\r\n  - id: s\r\n    command: /c\r\n    autonomy: auto\r\n    error_policy: stop\r\n";
     const result = parsePlaybook(yaml);
@@ -777,6 +847,38 @@ steps:
     error_policy: stop
 `;
     assert.throws(() => parsePlaybook(yaml), /must be true or false/);
+  });
+
+  test("throws on invalid model value", () => {
+    const yaml = `
+name: test
+description: Bad model
+version: 1.0
+args: []
+steps:
+  - id: s
+    command: /c
+    autonomy: auto
+    error_policy: stop
+    model: "invalid-model"
+`;
+    assert.throws(() => parsePlaybook(yaml), /model "invalid-model" is not valid/);
+  });
+
+  test("throws on case-sensitive model value (Sonnet)", () => {
+    const yaml = `
+name: test
+description: Case sensitive model
+version: 1.0
+args: []
+steps:
+  - id: s
+    command: /c
+    autonomy: auto
+    error_policy: stop
+    model: "Sonnet"
+`;
+    assert.throws(() => parsePlaybook(yaml), /model "Sonnet" is not valid/);
   });
 
   test("throws on invalid condition in inline list", () => {

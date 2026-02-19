@@ -15,6 +15,7 @@
 
 const AUTONOMY_VALUES = new Set(["auto", "gate_on_breaking", "gate_always", "skip"]);
 const ERROR_POLICY_VALUES = new Set(["stop", "retry_once", "gate"]);
+const ALLOWED_MODELS = new Set(["opus", "sonnet", "haiku"]);
 const ESCALATION_TRIGGER_VALUES = new Set([
   "postcondition_fail",
   "verdict_fail",
@@ -582,6 +583,18 @@ function _applyStepField(item, lineOrKv, lineNum) {
     case "parallel_group":
       item.parallel_group = value;
       break;
+    case "model":
+      if (value === "") {
+        item.model = null;
+      } else {
+        if (!ALLOWED_MODELS.has(value)) {
+          throw new Error(
+            `Line ${lineNum}: model "${value}" is not valid (allowed: ${[...ALLOWED_MODELS].join(", ")})`
+          );
+        }
+        item.model = value;
+      }
+      break;
     case "preconditions":
     case "postconditions":
     case "escalation_triggers": {
@@ -678,5 +691,6 @@ function _emptyStep() {
     error_policy: null,
     escalation_triggers: [],
     parallel_group: null,
+    model: null,
   };
 }
