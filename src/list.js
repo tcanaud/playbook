@@ -6,7 +6,6 @@
  * Supports --json flag for JSON output.
  */
 
-import { homedir } from "node:os";
 import { join } from "node:path";
 import { discoverSessions, parseSessions } from "./session.js";
 import { formatSessionsTable, formatSessionsJson } from "./format.js";
@@ -33,16 +32,16 @@ export async function list(args) {
     const useJson = args && args.includes("--json");
 
     // Construct path to .playbooks/sessions directory
-    const playbooksDir = join(homedir(), ".playbooks");
+    const playbooksDir = join(process.cwd(), ".playbooks");
     const sessionDirs = discoverSessions(playbooksDir);
 
     // Parse all discovered sessions
     const allSessions = parseSessions(sessionDirs);
 
-    // Sort by most recent first (descending order)
+    // Sort by most recent first (descending order by createdAt timestamp)
     allSessions.sort((a, b) => {
-      if (a.id > b.id) return -1;
-      if (a.id < b.id) return 1;
+      if (a.createdAt > b.createdAt) return -1;
+      if (a.createdAt < b.createdAt) return 1;
       return 0;
     });
 

@@ -5,7 +5,6 @@
  * in a human-readable format with session ID, creation time, and status.
  */
 
-import { homedir } from "node:os";
 import { join } from "node:path";
 import { discoverSessions, parseSessions } from "./session.js";
 import { formatSessionsTable } from "./format.js";
@@ -27,7 +26,7 @@ import { SESSION_STATUS } from "./constants.js";
 export async function status(args) {
   try {
     // Construct path to .playbooks/sessions directory
-    const playbooksDir = join(homedir(), ".playbooks");
+    const playbooksDir = join(process.cwd(), ".playbooks");
     const sessionDirs = discoverSessions(playbooksDir);
 
     // Parse all discovered sessions
